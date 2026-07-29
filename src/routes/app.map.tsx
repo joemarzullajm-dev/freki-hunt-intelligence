@@ -197,8 +197,8 @@ function MarkerDot({ feature, color, icon: Icon, onSelect }: any) {
     <button
       onClick={() => onSelect(feature)}
       style={{ left: `${feature.x}%`, top: `${feature.y}%` }}
-      className={`absolute -translate-x-1/2 -translate-y-1/2 grid h-6 w-6 place-items-center rounded-full ring-2 ring-background shadow ${color} text-primary-foreground hover:scale-110 transition`}
-      aria-label={feature.name}
+      className={`absolute -translate-x-1/2 -translate-y-1/2 grid h-6 w-6 place-items-center rounded-full ring-2 ring-background shadow hover:scale-110 transition ${color}`}
+      aria-label={`${feature.type}: ${feature.name}`}
     >
       <Icon className="h-3 w-3" />
     </button>
