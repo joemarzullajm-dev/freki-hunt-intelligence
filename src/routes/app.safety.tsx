@@ -18,11 +18,28 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { MapPin, Plus, Pencil, Trash2, ShieldCheck, Radio } from "lucide-react";
+import {
+  MapPin,
+  Plus,
+  Pencil,
+  Trash2,
+  ShieldCheck,
+  Radio,
+  Users,
+  Eye,
+  EyeOff,
+  Compass,
+  ChevronRight,
+} from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { useSafety, store, type TrustedContact } from "@/lib/freki-store";
+import {
+  useSafety,
+  store,
+  type TrustedContact,
+  type PublicLandMode,
+} from "@/lib/freki-store";
 
 export const Route = createFileRoute("/app/safety")({
   head: () => ({
@@ -170,6 +187,10 @@ function SafetyPage() {
             )}
           </section>
 
+          <PublicLandAwareness />
+
+
+
           <p className="px-1 text-xs text-muted-foreground">
             Freki stores this list in your browser for the demo. In production,
             location updates would only be transmitted while sharing is active
@@ -181,7 +202,239 @@ function SafetyPage() {
   );
 }
 
+function PublicLandAwareness() {
+  const safety = useSafety();
+  const [open, setOpen] = useState(false);
+  const auto = safety.onPublicLand;
+  const mode = safety.publicLandMode;
+  const participating = auto && mode !== "invisible";
+
+  const modeOptions: {
+    value: PublicLandMode;
+    label: string;
+    description: string;
+    Icon: typeof Eye;
+  }[] = [
+    {
+      value: "invisible",
+      label: "Invisible",
+      description: "You appear to no one. Nearby hunters panel is hidden.",
+      Icon: EyeOff,
+    },
+    {
+      value: "nearby",
+      label: "Visible to Nearby Hunters",
+      description:
+        "Other opted-in hunters on public land see your approximate distance and direction.",
+      Icon: Eye,
+    },
+    {
+      value: "trusted",
+      label: "Visible to Trusted Contacts Only",
+      description:
+        "Only your trusted contacts see you. Other hunters do not.",
+      Icon: ShieldCheck,
+    },
+  ];
+
+  return (
+    <section className="surface-panel overflow-hidden">
+      <div className="flex flex-wrap items-start justify-between gap-4 border-b border-border/60 p-5 sm:p-6">
+        <div className="min-w-0">
+          <div className="flex items-center gap-2">
+            <Compass className="h-4 w-4 text-[var(--bronze)]" />
+            <h2 className="font-display text-lg font-semibold">
+              Public Land Awareness
+            </h2>
+          </div>
+          <p className="mt-2 max-w-xl text-sm text-muted-foreground">
+            Activates automatically when you enter a public hunting property.
+            Improves safety and reduces hunter conflicts while protecting
+            everyone's exact hunting location. Participation is optional.
+          </p>
+        </div>
+        <span
+          className={cn(
+            "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-medium uppercase tracking-wider",
+            auto
+              ? "border-[var(--bronze)]/40 bg-[var(--bronze)]/10 text-[var(--bronze)]"
+              : "border-border/70 bg-muted/30 text-muted-foreground",
+          )}
+        >
+          <span
+            className={cn(
+              "h-1.5 w-1.5 rounded-full",
+              auto ? "bg-[var(--bronze)]" : "bg-muted-foreground/60",
+            )}
+          />
+          {auto ? "On public land" : "Private property"}
+        </span>
+      </div>
+
+      <div className="grid gap-2 p-5 sm:p-6">
+        <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+          Visibility
+        </div>
+        <div className="grid gap-2">
+          {modeOptions.map((o) => {
+            const selected = mode === o.value;
+            return (
+              <button
+                key={o.value}
+                type="button"
+                onClick={() => {
+                  store.setPublicLandMode(o.value);
+                  toast.success(`Visibility set to ${o.label}`);
+                }}
+                className={cn(
+                  "flex items-start gap-3 rounded-md border p-3 text-left transition",
+                  selected
+                    ? "border-[var(--bronze)]/60 bg-[var(--bronze)]/5"
+                    : "border-border/60 hover:border-border hover:bg-muted/30",
+                )}
+                aria-pressed={selected}
+              >
+                <o.Icon
+                  className={cn(
+                    "mt-0.5 h-4 w-4 shrink-0",
+                    selected
+                      ? "text-[var(--bronze)]"
+                      : "text-muted-foreground",
+                  )}
+                />
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium">{o.label}</span>
+                    {selected && (
+                      <span className="rounded-full bg-[var(--bronze)] px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wider text-primary-foreground">
+                        Selected
+                      </span>
+                    )}
+                  </div>
+                  <div className="mt-0.5 text-xs text-muted-foreground">
+                    {o.description}
+                  </div>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="mt-2 flex items-center justify-between rounded-md border border-dashed border-border/60 bg-muted/20 px-3 py-2 text-xs text-muted-foreground">
+          <span>
+            Demo: simulate entering public land to preview the Nearby Hunters
+            panel.
+          </span>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => store.setOnPublicLand(!auto)}
+          >
+            {auto ? "Leave public land" : "Enter public land"}
+          </Button>
+        </div>
+      </div>
+
+      {auto && mode !== "invisible" && (
+        <div className="border-t border-border/60 bg-card/50">
+          <div className="flex items-center justify-between gap-3 p-5 sm:p-6">
+            <div className="flex items-center gap-3">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--forest)]/40">
+                <Users className="h-4 w-4" />
+              </div>
+              <div>
+                <div className="font-display text-base font-semibold">
+                  Hunters Nearby
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  {safety.nearbySharingCount} Hunters Currently Sharing
+                </div>
+              </div>
+            </div>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setOpen(true)}
+              className="gap-1.5"
+            >
+              View Nearby Hunters
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+
+          <ul className="divide-y divide-border/60 border-t border-border/60">
+            {safety.nearbyHunters.slice(0, 3).map((h) => (
+              <NearbyHunterRow key={h.id} hunter={h} />
+            ))}
+          </ul>
+
+          <div className="border-t border-border/60 px-5 py-3 text-[11px] text-muted-foreground sm:px-6">
+            Approximate distance and direction only. Exact GPS coordinates are
+            never shared with other hunters.
+          </div>
+        </div>
+      )}
+
+      {participating === false && auto && (
+        <div className="border-t border-border/60 bg-muted/20 p-5 text-sm text-muted-foreground sm:p-6">
+          You're invisible on public land. No one can see your approximate
+          location.
+        </div>
+      )}
+
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Hunters Nearby</DialogTitle>
+          </DialogHeader>
+          <div className="text-xs text-muted-foreground">
+            {safety.nearbySharingCount} Hunters Currently Sharing · approximate
+            positions only
+          </div>
+          <ul className="max-h-[60vh] divide-y divide-border/60 overflow-y-auto rounded-md border border-border/60">
+            {safety.nearbyHunters.map((h) => (
+              <NearbyHunterRow key={h.id} hunter={h} />
+            ))}
+          </ul>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setOpen(false)}>
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </section>
+  );
+}
+
+function NearbyHunterRow({
+  hunter,
+}: {
+  hunter: { username: string; distanceMiles: number; direction: string };
+}) {
+  return (
+    <li className="flex items-center gap-4 px-5 py-3 sm:px-6">
+      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-muted/40">
+        <Compass className="h-4 w-4 text-muted-foreground" />
+      </div>
+      <div className="min-w-0 flex-1">
+        <div className="truncate font-medium">{hunter.username}</div>
+        <div className="text-xs text-muted-foreground">
+          Approximate location
+        </div>
+      </div>
+      <div className="text-right">
+        <div className="text-sm font-medium tabular-nums">
+          {hunter.distanceMiles.toFixed(1)} miles
+        </div>
+        <div className="text-xs text-muted-foreground">{hunter.direction}</div>
+      </div>
+    </li>
+  );
+}
+
 function ContactRow({
+
   contact,
   sharingActive,
 }: {
