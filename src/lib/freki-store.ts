@@ -123,6 +123,17 @@ export type NearbyHunter = {
     | "Northwest";
 };
 
+export type EmergencyInfo = {
+  fullName: string;
+  bloodType: string;
+  allergies: string;
+  medications: string;
+  medicalNotes: string;
+  emergencyContactName: string;
+  emergencyContactPhone: string;
+  vehicleDescription: string;
+};
+
 export type Safety = {
   sharingEnabled: boolean;
   contacts: TrustedContact[];
@@ -130,6 +141,7 @@ export type Safety = {
   onPublicLand: boolean;
   nearbyHunters: NearbyHunter[];
   nearbySharingCount: number;
+  emergency: EmergencyInfo;
 };
 
 type State = {
