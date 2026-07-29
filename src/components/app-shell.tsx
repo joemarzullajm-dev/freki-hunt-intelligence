@@ -20,6 +20,7 @@ import {
   Wind,
   Wrench,
   Plus,
+  ShieldCheck,
 } from "lucide-react";
 import {
   DropdownMenu,
