@@ -13,12 +13,17 @@ import { Route as DemoRouteImport } from './routes/demo'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppIndexRouteImport } from './routes/app.index'
+import { Route as AppSettingsRouteImport } from './routes/app.settings'
+import { Route as AppReportsRouteImport } from './routes/app.reports'
 import { Route as AppPropertiesRouteImport } from './routes/app.properties'
 import { Route as AppObservationsRouteImport } from './routes/app.observations'
 import { Route as AppMapRouteImport } from './routes/app.map'
+import { Route as AppHistoryRouteImport } from './routes/app.history'
+import { Route as AppEvaluationRouteImport } from './routes/app.evaluation'
 import { Route as AppDashboardRouteImport } from './routes/app.dashboard'
 import { Route as AppCamerasRouteImport } from './routes/app.cameras'
 import { Route as AppBrainRouteImport } from './routes/app.brain'
+import { Route as AppAiRouteImport } from './routes/app.ai'
 
 const DemoRoute = DemoRouteImport.update({
   id: '/demo',
@@ -40,6 +45,16 @@ const AppIndexRoute = AppIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppRoute,
 } as any)
+const AppSettingsRoute = AppSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppReportsRoute = AppReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppPropertiesRoute = AppPropertiesRouteImport.update({
   id: '/properties',
   path: '/properties',
@@ -53,6 +68,16 @@ const AppObservationsRoute = AppObservationsRouteImport.update({
 const AppMapRoute = AppMapRouteImport.update({
   id: '/map',
   path: '/map',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppHistoryRoute = AppHistoryRouteImport.update({
+  id: '/history',
+  path: '/history',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppEvaluationRoute = AppEvaluationRouteImport.update({
+  id: '/evaluation',
+  path: '/evaluation',
   getParentRoute: () => AppRoute,
 } as any)
 const AppDashboardRoute = AppDashboardRouteImport.update({
@@ -70,28 +95,43 @@ const AppBrainRoute = AppBrainRouteImport.update({
   path: '/brain',
   getParentRoute: () => AppRoute,
 } as any)
+const AppAiRoute = AppAiRouteImport.update({
+  id: '/ai',
+  path: '/ai',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/demo': typeof DemoRoute
+  '/app/ai': typeof AppAiRoute
   '/app/brain': typeof AppBrainRoute
   '/app/cameras': typeof AppCamerasRoute
   '/app/dashboard': typeof AppDashboardRoute
+  '/app/evaluation': typeof AppEvaluationRoute
+  '/app/history': typeof AppHistoryRoute
   '/app/map': typeof AppMapRoute
   '/app/observations': typeof AppObservationsRoute
   '/app/properties': typeof AppPropertiesRoute
+  '/app/reports': typeof AppReportsRoute
+  '/app/settings': typeof AppSettingsRoute
   '/app/': typeof AppIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/demo': typeof DemoRoute
+  '/app/ai': typeof AppAiRoute
   '/app/brain': typeof AppBrainRoute
   '/app/cameras': typeof AppCamerasRoute
   '/app/dashboard': typeof AppDashboardRoute
+  '/app/evaluation': typeof AppEvaluationRoute
+  '/app/history': typeof AppHistoryRoute
   '/app/map': typeof AppMapRoute
   '/app/observations': typeof AppObservationsRoute
   '/app/properties': typeof AppPropertiesRoute
+  '/app/reports': typeof AppReportsRoute
+  '/app/settings': typeof AppSettingsRoute
   '/app': typeof AppIndexRoute
 }
 export interface FileRoutesById {
@@ -99,12 +139,17 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/demo': typeof DemoRoute
+  '/app/ai': typeof AppAiRoute
   '/app/brain': typeof AppBrainRoute
   '/app/cameras': typeof AppCamerasRoute
   '/app/dashboard': typeof AppDashboardRoute
+  '/app/evaluation': typeof AppEvaluationRoute
+  '/app/history': typeof AppHistoryRoute
   '/app/map': typeof AppMapRoute
   '/app/observations': typeof AppObservationsRoute
   '/app/properties': typeof AppPropertiesRoute
+  '/app/reports': typeof AppReportsRoute
+  '/app/settings': typeof AppSettingsRoute
   '/app/': typeof AppIndexRoute
 }
 export interface FileRouteTypes {
@@ -113,35 +158,50 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/demo'
+    | '/app/ai'
     | '/app/brain'
     | '/app/cameras'
     | '/app/dashboard'
+    | '/app/evaluation'
+    | '/app/history'
     | '/app/map'
     | '/app/observations'
     | '/app/properties'
+    | '/app/reports'
+    | '/app/settings'
     | '/app/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/demo'
+    | '/app/ai'
     | '/app/brain'
     | '/app/cameras'
     | '/app/dashboard'
+    | '/app/evaluation'
+    | '/app/history'
     | '/app/map'
     | '/app/observations'
     | '/app/properties'
+    | '/app/reports'
+    | '/app/settings'
     | '/app'
   id:
     | '__root__'
     | '/'
     | '/app'
     | '/demo'
+    | '/app/ai'
     | '/app/brain'
     | '/app/cameras'
     | '/app/dashboard'
+    | '/app/evaluation'
+    | '/app/history'
     | '/app/map'
     | '/app/observations'
     | '/app/properties'
+    | '/app/reports'
+    | '/app/settings'
     | '/app/'
   fileRoutesById: FileRoutesById
 }
@@ -181,6 +241,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/settings': {
+      id: '/app/settings'
+      path: '/settings'
+      fullPath: '/app/settings'
+      preLoaderRoute: typeof AppSettingsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/reports': {
+      id: '/app/reports'
+      path: '/reports'
+      fullPath: '/app/reports'
+      preLoaderRoute: typeof AppReportsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/properties': {
       id: '/app/properties'
       path: '/properties'
@@ -200,6 +274,20 @@ declare module '@tanstack/react-router' {
       path: '/map'
       fullPath: '/app/map'
       preLoaderRoute: typeof AppMapRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/history': {
+      id: '/app/history'
+      path: '/history'
+      fullPath: '/app/history'
+      preLoaderRoute: typeof AppHistoryRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/evaluation': {
+      id: '/app/evaluation'
+      path: '/evaluation'
+      fullPath: '/app/evaluation'
+      preLoaderRoute: typeof AppEvaluationRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/dashboard': {
@@ -223,26 +311,43 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppBrainRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/ai': {
+      id: '/app/ai'
+      path: '/ai'
+      fullPath: '/app/ai'
+      preLoaderRoute: typeof AppAiRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
 interface AppRouteChildren {
+  AppAiRoute: typeof AppAiRoute
   AppBrainRoute: typeof AppBrainRoute
   AppCamerasRoute: typeof AppCamerasRoute
   AppDashboardRoute: typeof AppDashboardRoute
+  AppEvaluationRoute: typeof AppEvaluationRoute
+  AppHistoryRoute: typeof AppHistoryRoute
   AppMapRoute: typeof AppMapRoute
   AppObservationsRoute: typeof AppObservationsRoute
   AppPropertiesRoute: typeof AppPropertiesRoute
+  AppReportsRoute: typeof AppReportsRoute
+  AppSettingsRoute: typeof AppSettingsRoute
   AppIndexRoute: typeof AppIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppAiRoute: AppAiRoute,
   AppBrainRoute: AppBrainRoute,
   AppCamerasRoute: AppCamerasRoute,
   AppDashboardRoute: AppDashboardRoute,
+  AppEvaluationRoute: AppEvaluationRoute,
+  AppHistoryRoute: AppHistoryRoute,
   AppMapRoute: AppMapRoute,
   AppObservationsRoute: AppObservationsRoute,
   AppPropertiesRoute: AppPropertiesRoute,
+  AppReportsRoute: AppReportsRoute,
+  AppSettingsRoute: AppSettingsRoute,
   AppIndexRoute: AppIndexRoute,
 }
 
