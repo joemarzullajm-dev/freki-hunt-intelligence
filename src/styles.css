@@ -158,3 +158,38 @@
     radial-gradient(circle at 20% 30%, color-mix(in oklch, var(--forest) 8%, transparent) 0, transparent 40%),
     radial-gradient(circle at 80% 70%, color-mix(in oklch, var(--bronze) 6%, transparent) 0, transparent 40%);
 }
+
+/* TRTH — Home screen scope. Soft dark canvas + bright chartreuse accent. */
+.trth-scope {
+  --trth-bg: #0f1116;
+  --trth-surface: #171a21;
+  --trth-surface-2: #1f232c;
+  --trth-line: rgba(255, 255, 255, 0.07);
+  --trth-line-strong: rgba(255, 255, 255, 0.14);
+  --trth-ink: #f2efe7;
+  --trth-ink-dim: rgba(242, 239, 231, 0.62);
+  --trth-ink-mute: rgba(242, 239, 231, 0.42);
+  --trth-accent: #d6ff5b;
+  --trth-accent-ink: #12141a;
+  --trth-serif: "Instrument Serif", "Fraunces", ui-serif, Georgia, serif;
+  --trth-body: "Work Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  background: var(--trth-bg);
+  color: var(--trth-ink);
+  font-family: var(--trth-body);
+  min-height: 100dvh;
+}
+.trth-scope .serif { font-family: var(--trth-serif); letter-spacing: -0.015em; font-weight: 500; }
+.trth-scope .card { background: var(--trth-surface); border: 1px solid var(--trth-line); border-radius: 20px; }
+.trth-scope .card-2 { background: var(--trth-surface-2); border: 1px solid var(--trth-line); border-radius: 16px; }
+.trth-scope .divide-line > * + * { border-top: 1px solid var(--trth-line); }
+.trth-scope .hairline { border-color: var(--trth-line); }
+.trth-scope .accent { color: var(--trth-accent); }
+.trth-scope .accent-bg { background: var(--trth-accent); color: var(--trth-accent-ink); }
+.trth-scope .kbd-num { font-family: var(--trth-body); font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
+.trth-scope .topo-veil {
+  background-image:
+    radial-gradient(1200px 500px at 80% -10%, rgba(214, 255, 91, 0.06), transparent 60%),
+    radial-gradient(900px 400px at -10% 10%, rgba(255, 255, 255, 0.03), transparent 60%);
+}
+
