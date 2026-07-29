@@ -54,6 +54,7 @@ function Dashboard() {
               conflicting={huntOutlook.conflicting}
               uncertainty="East Ridge camera has been offline for 3 days — that quadrant is under-observed."
             />
+            <PropertySafetyCard />
             <ActivityChart />
             <Hypothesis />
             <Observations />
