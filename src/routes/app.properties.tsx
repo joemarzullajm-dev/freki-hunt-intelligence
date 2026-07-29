@@ -9,6 +9,7 @@ import { MapPin, Camera, Trees, Droplets, Wheat, Plus, Check, Trash2 } from "luc
 import { useProperties, useFreki, store } from "@/lib/freki-store";
 import { useState } from "react";
 import { toast } from "sonner";
+import { LiveSharingBanner, PropertySafetyCard } from "@/components/property-safety";
 
 export const Route = createFileRoute("/app/properties")({
   head: () => ({
@@ -27,12 +28,14 @@ function Properties() {
 
   return (
     <>
+      <LiveSharingBanner />
       <PageHeader
         title="Properties"
         description="Create a new property or open an existing one. Everything is saved to your browser."
         actions={<NewPropertyDialog />}
       />
       <PageBody>
+        <PropertySafetyCard className="mb-6 max-w-md" />
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {properties.map((p) => {
             const active = p.id === activeId;
