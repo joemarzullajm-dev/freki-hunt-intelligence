@@ -147,11 +147,16 @@ function Ask() {
                   )}
                   <div className={`max-w-2xl ${m.role === "user" ? "rounded-2xl bg-foreground text-background px-4 py-2 text-sm" : "space-y-2"}`}>
                     <p className="text-sm leading-relaxed">{m.content}</p>
-                    {m.role === "assistant" && (m.supporting || m.conflicting) && (
+                    {m.role === "assistant" && typeof m.confidence === "number" && (
                       <TruthScore
-                        score={m.confidence ?? 60}
+                        score={m.confidence}
                         supporting={m.supporting}
                         conflicting={m.conflicting}
+                        uncertainty={
+                          (!m.supporting || m.supporting.length === 0) && (!m.conflicting || m.conflicting.length === 0)
+                            ? "Limited direct evidence for this question — treat as a working answer, not a conclusion."
+                            : undefined
+                        }
                         compact
                       />
                     )}
