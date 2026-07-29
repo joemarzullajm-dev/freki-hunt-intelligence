@@ -99,10 +99,23 @@ export type Property = {
   hunts: HuntRecord[];
 };
 
+export type TrustedContact = {
+  id: string;
+  name: string;
+  relationship: string;
+  sharing: boolean;
+};
+
+export type Safety = {
+  sharingEnabled: boolean;
+  contacts: TrustedContact[];
+};
+
 type State = {
   activeId: string;
   properties: Property[];
   conditions: Conditions;
+  safety: Safety;
 };
 
 const STORAGE_KEY = "freki:v1";
@@ -116,6 +129,15 @@ const defaultConditions: Conditions = {
   precipitation: "None",
   timeOfDay: "Evening",
   pressure: "Low",
+};
+
+const defaultSafety: Safety = {
+  sharingEnabled: false,
+  contacts: [
+    { id: "tc-1", name: "Sarah Halden", relationship: "Spouse", sharing: true },
+    { id: "tc-2", name: "Mike Reeves", relationship: "Hunting Partner", sharing: true },
+    { id: "tc-3", name: "Dad", relationship: "Father", sharing: false },
+  ],
 };
 
 function seedProperties(): Property[] {
