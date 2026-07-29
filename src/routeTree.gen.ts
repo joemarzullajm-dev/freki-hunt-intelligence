@@ -14,7 +14,10 @@ import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppIndexRouteImport } from './routes/app.index'
 import { Route as AppPropertiesRouteImport } from './routes/app.properties'
+import { Route as AppObservationsRouteImport } from './routes/app.observations'
+import { Route as AppMapRouteImport } from './routes/app.map'
 import { Route as AppDashboardRouteImport } from './routes/app.dashboard'
+import { Route as AppCamerasRouteImport } from './routes/app.cameras'
 import { Route as AppBrainRouteImport } from './routes/app.brain'
 
 const DemoRoute = DemoRouteImport.update({
@@ -42,9 +45,24 @@ const AppPropertiesRoute = AppPropertiesRouteImport.update({
   path: '/properties',
   getParentRoute: () => AppRoute,
 } as any)
+const AppObservationsRoute = AppObservationsRouteImport.update({
+  id: '/observations',
+  path: '/observations',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMapRoute = AppMapRouteImport.update({
+  id: '/map',
+  path: '/map',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppDashboardRoute = AppDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCamerasRoute = AppCamerasRouteImport.update({
+  id: '/cameras',
+  path: '/cameras',
   getParentRoute: () => AppRoute,
 } as any)
 const AppBrainRoute = AppBrainRouteImport.update({
@@ -58,7 +76,10 @@ export interface FileRoutesByFullPath {
   '/app': typeof AppRouteWithChildren
   '/demo': typeof DemoRoute
   '/app/brain': typeof AppBrainRoute
+  '/app/cameras': typeof AppCamerasRoute
   '/app/dashboard': typeof AppDashboardRoute
+  '/app/map': typeof AppMapRoute
+  '/app/observations': typeof AppObservationsRoute
   '/app/properties': typeof AppPropertiesRoute
   '/app/': typeof AppIndexRoute
 }
@@ -66,7 +87,10 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/demo': typeof DemoRoute
   '/app/brain': typeof AppBrainRoute
+  '/app/cameras': typeof AppCamerasRoute
   '/app/dashboard': typeof AppDashboardRoute
+  '/app/map': typeof AppMapRoute
+  '/app/observations': typeof AppObservationsRoute
   '/app/properties': typeof AppPropertiesRoute
   '/app': typeof AppIndexRoute
 }
@@ -76,7 +100,10 @@ export interface FileRoutesById {
   '/app': typeof AppRouteWithChildren
   '/demo': typeof DemoRoute
   '/app/brain': typeof AppBrainRoute
+  '/app/cameras': typeof AppCamerasRoute
   '/app/dashboard': typeof AppDashboardRoute
+  '/app/map': typeof AppMapRoute
+  '/app/observations': typeof AppObservationsRoute
   '/app/properties': typeof AppPropertiesRoute
   '/app/': typeof AppIndexRoute
 }
@@ -87,7 +114,10 @@ export interface FileRouteTypes {
     | '/app'
     | '/demo'
     | '/app/brain'
+    | '/app/cameras'
     | '/app/dashboard'
+    | '/app/map'
+    | '/app/observations'
     | '/app/properties'
     | '/app/'
   fileRoutesByTo: FileRoutesByTo
@@ -95,7 +125,10 @@ export interface FileRouteTypes {
     | '/'
     | '/demo'
     | '/app/brain'
+    | '/app/cameras'
     | '/app/dashboard'
+    | '/app/map'
+    | '/app/observations'
     | '/app/properties'
     | '/app'
   id:
@@ -104,7 +137,10 @@ export interface FileRouteTypes {
     | '/app'
     | '/demo'
     | '/app/brain'
+    | '/app/cameras'
     | '/app/dashboard'
+    | '/app/map'
+    | '/app/observations'
     | '/app/properties'
     | '/app/'
   fileRoutesById: FileRoutesById
@@ -152,11 +188,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppPropertiesRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/observations': {
+      id: '/app/observations'
+      path: '/observations'
+      fullPath: '/app/observations'
+      preLoaderRoute: typeof AppObservationsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/map': {
+      id: '/app/map'
+      path: '/map'
+      fullPath: '/app/map'
+      preLoaderRoute: typeof AppMapRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/dashboard': {
       id: '/app/dashboard'
       path: '/dashboard'
       fullPath: '/app/dashboard'
       preLoaderRoute: typeof AppDashboardRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/cameras': {
+      id: '/app/cameras'
+      path: '/cameras'
+      fullPath: '/app/cameras'
+      preLoaderRoute: typeof AppCamerasRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/brain': {
@@ -171,14 +228,20 @@ declare module '@tanstack/react-router' {
 
 interface AppRouteChildren {
   AppBrainRoute: typeof AppBrainRoute
+  AppCamerasRoute: typeof AppCamerasRoute
   AppDashboardRoute: typeof AppDashboardRoute
+  AppMapRoute: typeof AppMapRoute
+  AppObservationsRoute: typeof AppObservationsRoute
   AppPropertiesRoute: typeof AppPropertiesRoute
   AppIndexRoute: typeof AppIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppBrainRoute: AppBrainRoute,
+  AppCamerasRoute: AppCamerasRoute,
   AppDashboardRoute: AppDashboardRoute,
+  AppMapRoute: AppMapRoute,
+  AppObservationsRoute: AppObservationsRoute,
   AppPropertiesRoute: AppPropertiesRoute,
   AppIndexRoute: AppIndexRoute,
 }
