@@ -9,6 +9,7 @@ import { MapPin, Camera, Trees, Droplets, Wheat, Plus, Check, Trash2 } from "luc
 import { useProperties, useFreki, store } from "@/lib/freki-store";
 import { useState } from "react";
 import { toast } from "sonner";
+import { LiveSharingBanner, PropertySafetyCard } from "@/components/property-safety";
 
 export const Route = createFileRoute("/app/properties")({
   head: () => ({
