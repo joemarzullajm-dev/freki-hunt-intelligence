@@ -16,6 +16,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppIndexRouteImport } from './routes/app.index'
 import { Route as AppSetupRouteImport } from './routes/app.setup'
 import { Route as AppSettingsRouteImport } from './routes/app.settings'
+import { Route as AppSafetyRouteImport } from './routes/app.safety'
 import { Route as AppReportsRouteImport } from './routes/app.reports'
 import { Route as AppPropertiesRouteImport } from './routes/app.properties'
 import { Route as AppObservationsRouteImport } from './routes/app.observations'
@@ -60,6 +61,11 @@ const AppSetupRoute = AppSetupRouteImport.update({
 const AppSettingsRoute = AppSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSafetyRoute = AppSafetyRouteImport.update({
+  id: '/safety',
+  path: '/safety',
   getParentRoute: () => AppRoute,
 } as any)
 const AppReportsRoute = AppReportsRouteImport.update({
@@ -128,6 +134,7 @@ export interface FileRoutesByFullPath {
   '/app/observations': typeof AppObservationsRoute
   '/app/properties': typeof AppPropertiesRoute
   '/app/reports': typeof AppReportsRoute
+  '/app/safety': typeof AppSafetyRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/setup': typeof AppSetupRoute
   '/app/': typeof AppIndexRoute
@@ -146,6 +153,7 @@ export interface FileRoutesByTo {
   '/app/observations': typeof AppObservationsRoute
   '/app/properties': typeof AppPropertiesRoute
   '/app/reports': typeof AppReportsRoute
+  '/app/safety': typeof AppSafetyRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/setup': typeof AppSetupRoute
   '/app': typeof AppIndexRoute
@@ -166,6 +174,7 @@ export interface FileRoutesById {
   '/app/observations': typeof AppObservationsRoute
   '/app/properties': typeof AppPropertiesRoute
   '/app/reports': typeof AppReportsRoute
+  '/app/safety': typeof AppSafetyRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/setup': typeof AppSetupRoute
   '/app/': typeof AppIndexRoute
@@ -187,6 +196,7 @@ export interface FileRouteTypes {
     | '/app/observations'
     | '/app/properties'
     | '/app/reports'
+    | '/app/safety'
     | '/app/settings'
     | '/app/setup'
     | '/app/'
@@ -205,6 +215,7 @@ export interface FileRouteTypes {
     | '/app/observations'
     | '/app/properties'
     | '/app/reports'
+    | '/app/safety'
     | '/app/settings'
     | '/app/setup'
     | '/app'
@@ -224,6 +235,7 @@ export interface FileRouteTypes {
     | '/app/observations'
     | '/app/properties'
     | '/app/reports'
+    | '/app/safety'
     | '/app/settings'
     | '/app/setup'
     | '/app/'
@@ -285,6 +297,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/app/settings'
       preLoaderRoute: typeof AppSettingsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/safety': {
+      id: '/app/safety'
+      path: '/safety'
+      fullPath: '/app/safety'
+      preLoaderRoute: typeof AppSafetyRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/reports': {
@@ -371,6 +390,7 @@ interface AppRouteChildren {
   AppObservationsRoute: typeof AppObservationsRoute
   AppPropertiesRoute: typeof AppPropertiesRoute
   AppReportsRoute: typeof AppReportsRoute
+  AppSafetyRoute: typeof AppSafetyRoute
   AppSettingsRoute: typeof AppSettingsRoute
   AppSetupRoute: typeof AppSetupRoute
   AppIndexRoute: typeof AppIndexRoute
@@ -387,6 +407,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppObservationsRoute: AppObservationsRoute,
   AppPropertiesRoute: AppPropertiesRoute,
   AppReportsRoute: AppReportsRoute,
+  AppSafetyRoute: AppSafetyRoute,
   AppSettingsRoute: AppSettingsRoute,
   AppSetupRoute: AppSetupRoute,
   AppIndexRoute: AppIndexRoute,

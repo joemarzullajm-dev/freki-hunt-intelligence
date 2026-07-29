@@ -20,6 +20,7 @@ import {
   Wind,
   Wrench,
   Plus,
+  ShieldCheck,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -44,6 +45,7 @@ const nav = [
   { to: "/app/history", label: "Hunt History", icon: History },
   { to: "/app/ai", label: "Ask Freki", icon: Sparkles },
   { to: "/app/reports", label: "Reports", icon: FileText },
+  { to: "/app/safety", label: "Safety", icon: ShieldCheck },
   { to: "/app/settings", label: "Settings", icon: Settings },
 ];
 

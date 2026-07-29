@@ -99,10 +99,23 @@ export type Property = {
   hunts: HuntRecord[];
 };
 
+export type TrustedContact = {
+  id: string;
+  name: string;
+  relationship: string;
+  sharing: boolean;
+};
+
+export type Safety = {
+  sharingEnabled: boolean;
+  contacts: TrustedContact[];
+};
+
 type State = {
   activeId: string;
   properties: Property[];
   conditions: Conditions;
+  safety: Safety;
 };
 
 const STORAGE_KEY = "freki:v1";
@@ -116,6 +129,15 @@ const defaultConditions: Conditions = {
   precipitation: "None",
   timeOfDay: "Evening",
   pressure: "Low",
+};
+
+const defaultSafety: Safety = {
+  sharingEnabled: false,
+  contacts: [
+    { id: "tc-1", name: "Sarah Halden", relationship: "Spouse", sharing: true },
+    { id: "tc-2", name: "Mike Reeves", relationship: "Hunting Partner", sharing: true },
+    { id: "tc-3", name: "Dad", relationship: "Father", sharing: false },
+  ],
 };
 
 function seedProperties(): Property[] {
@@ -152,7 +174,7 @@ function seedProperties(): Property[] {
 }
 
 function initialState(): State {
-  return { activeId: seedProperty.id, properties: seedProperties(), conditions: defaultConditions };
+  return { activeId: seedProperty.id, properties: seedProperties(), conditions: defaultConditions, safety: { ...defaultSafety, contacts: defaultSafety.contacts.map((c) => ({ ...c })) } };
 }
 
 function load(): State {
@@ -160,9 +182,15 @@ function load(): State {
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) return initialState();
-    const parsed = JSON.parse(raw) as State;
+    const parsed = JSON.parse(raw) as Partial<State>;
     if (!parsed.properties?.length) return initialState();
-    return { ...initialState(), ...parsed, conditions: { ...defaultConditions, ...parsed.conditions } };
+    const base = initialState();
+    return {
+      ...base,
+      ...parsed,
+      conditions: { ...defaultConditions, ...(parsed.conditions ?? {}) },
+      safety: { ...base.safety, ...(parsed.safety ?? {}) },
+    } as State;
   } catch {
     return initialState();
   }
@@ -203,6 +231,10 @@ export function useConditions(): Conditions {
   return useFreki((s) => s.conditions);
 }
 
+export function useSafety(): Safety {
+  return useFreki((s) => s.safety);
+}
+
 export const store = {
   // properties
   addProperty(input: Omit<Property, "id" | "stands" | "cameras" | "food" | "bedding" | "access" | "observations" | "hunts">) {
@@ -229,6 +261,22 @@ export const store = {
   // conditions
   setConditions(patch: Partial<Conditions>) {
     set((s) => ({ ...s, conditions: { ...s.conditions, ...patch } }));
+  },
+
+  // safety
+  setSharingEnabled(enabled: boolean) {
+    set((s) => ({ ...s, safety: { ...s.safety, sharingEnabled: enabled } }));
+  },
+  addContact(v: Omit<TrustedContact, "id">) {
+    const id = `tc-${Date.now()}`;
+    set((s) => ({ ...s, safety: { ...s.safety, contacts: [...s.safety.contacts, { ...v, id }] } }));
+    return id;
+  },
+  updateContact(id: string, patch: Partial<TrustedContact>) {
+    set((s) => ({ ...s, safety: { ...s.safety, contacts: s.safety.contacts.map((c) => c.id === id ? { ...c, ...patch } : c) } }));
+  },
+  removeContact(id: string) {
+    set((s) => ({ ...s, safety: { ...s.safety, contacts: s.safety.contacts.filter((c) => c.id !== id) } }));
   },
 
   // generic collection helpers on active property
