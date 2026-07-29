@@ -115,9 +115,12 @@ function Ask() {
   const [messages, setMessages] = useState<Msg[]>([
     { role: "assistant", content: "I'm Freki. I can reason about Black Ridge Farm's cameras, observations, hunt history, and current conditions. Ask me something — I'll show my evidence." },
   ]);
+  const scrollerRef = useRef<HTMLDivElement>(null);
   const [input, setInput] = useState("");
-  const endRef = useRef<HTMLDivElement>(null);
-  useEffect(() => { endRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
+  useEffect(() => {
+    const el = scrollerRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [messages]);
 
   function send(text: string) {
     if (!text.trim()) return;
