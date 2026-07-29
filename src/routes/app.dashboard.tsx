@@ -28,7 +28,6 @@ export const Route = createFileRoute("/app/dashboard")({
 function Dashboard() {
   return (
     <>
-    <>
       <LiveSharingBanner />
       <PageHeader
         title={`Overview — ${property.name}`}
