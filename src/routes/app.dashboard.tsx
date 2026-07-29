@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import {
   conditions, huntOutlook, property, detections, observations, cameras,
-  weeklyActivity,
+  weeklyActivity, cameraTotals,
 } from "@/lib/freki-data";
 import { Link } from "@tanstack/react-router";
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis, CartesianGrid } from "recharts";
