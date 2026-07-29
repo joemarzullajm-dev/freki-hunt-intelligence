@@ -123,6 +123,17 @@ export type NearbyHunter = {
     | "Northwest";
 };
 
+export type EmergencyInfo = {
+  fullName: string;
+  bloodType: string;
+  allergies: string;
+  medications: string;
+  medicalNotes: string;
+  emergencyContactName: string;
+  emergencyContactPhone: string;
+  vehicleDescription: string;
+};
+
 export type Safety = {
   sharingEnabled: boolean;
   contacts: TrustedContact[];
@@ -130,6 +141,7 @@ export type Safety = {
   onPublicLand: boolean;
   nearbyHunters: NearbyHunter[];
   nearbySharingCount: number;
+  emergency: EmergencyInfo;
 };
 
 type State = {
@@ -172,6 +184,16 @@ const defaultSafety: Safety = {
     { id: "nh-7", username: "Chris W.", distanceMiles: 2.4, direction: "Southeast" },
     { id: "nh-8", username: "Dan H.", distanceMiles: 2.9, direction: "North" },
   ],
+  emergency: {
+    fullName: "",
+    bloodType: "",
+    allergies: "",
+    medications: "",
+    medicalNotes: "",
+    emergencyContactName: "",
+    emergencyContactPhone: "",
+    vehicleDescription: "",
+  },
 };
 
 function seedProperties(): Property[] {
@@ -317,6 +339,9 @@ export const store = {
   },
   setOnPublicLand(v: boolean) {
     set((s) => ({ ...s, safety: { ...s.safety, onPublicLand: v } }));
+  },
+  setEmergencyInfo(patch: Partial<EmergencyInfo>) {
+    set((s) => ({ ...s, safety: { ...s.safety, emergency: { ...s.safety.emergency, ...patch } } }));
   },
 
   // generic collection helpers on active property
