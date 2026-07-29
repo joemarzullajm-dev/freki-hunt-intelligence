@@ -1,107 +1,137 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageHeader, PageBody } from "@/components/app-shell";
-import { stands } from "@/lib/freki-data";
-import { TruthScore } from "@/components/truth-score";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
 import { useState } from "react";
-import { Target, Wind, Route as RouteIcon, Bed, Activity, Clock, ThermometerSun, CheckCircle2 } from "lucide-react";
+import { Target, Wind, Route as RouteIcon, Bed, Activity, CheckCircle2, HelpCircle, AlertTriangle, Save } from "lucide-react";
+import { useActiveProperty, useConditions, store, evaluateHunt, type HuntRecommendation } from "@/lib/freki-store";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/app/evaluation")({
   head: () => ({
     meta: [
       { title: "Hunt Evaluation — Freki" },
-      { name: "description", content: "Evaluate a planned hunt against wind, access, pressure, and history." },
+      { name: "description", content: "Evaluate a planned hunt against wind, access, pressure and history." },
     ],
   }),
   component: Evaluation,
 });
 
+const WINDS = ["N","NE","E","SE","S","SW","W","NW"];
+
 function Evaluation() {
-  const [standId, setStandId] = useState("north-funnel");
-  const [wind, setWind] = useState("NW");
-  const [pressure, setPressure] = useState("Low");
-  const [result, setResult] = useState<null | ReturnType<typeof evaluate>>(null);
+  const p = useActiveProperty();
+  const c = useConditions();
+  const [standId, setStandId] = useState<string>(p.stands[0]?.id ?? "");
+  const [result, setResult] = useState<HuntRecommendation | null>(null);
 
-  const stand = stands.find((s) => s.id === standId)!;
-
-  function evaluate() {
-    const windFit = stand.bestWind.includes(wind);
-    const base = windFit ? 78 : 46;
-    const pressurePenalty = pressure === "High" ? -18 : pressure === "Moderate" ? -6 : 0;
-    const score = Math.max(10, Math.min(96, base + pressurePenalty));
-    return {
-      score,
-      truth: windFit ? 74 : 58,
-      windFit,
-      pressure,
-      stand,
-      window: "Final 90 minutes of daylight",
-      access: windFit ? "Downwind of primary bedding — clean entry" : "Wind carries scent toward bedding — risky",
-    };
+  function run() {
+    const r = evaluateHunt({ property: p, conditions: c, standId: standId || undefined });
+    setResult(r);
+    if (r.recommendedStand) setStandId(r.recommendedStand.id);
   }
 
   return (
     <>
       <PageHeader
         title="Hunt Evaluation"
-        description="Score a planned hunt with the reasoning that goes into it."
+        description="Enter current conditions. Freki explains why — and what it doesn't know."
       />
       <PageBody>
         <div className="grid gap-6 lg:grid-cols-[380px_1fr]">
           <form
-            onSubmit={(e) => { e.preventDefault(); setResult(evaluate()); }}
+            onSubmit={(e) => { e.preventDefault(); run(); }}
             className="surface-panel p-5 space-y-3 h-fit"
           >
-            <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Planned hunt</div>
-            <F label="Property"><Input defaultValue="Black Ridge Farm" disabled /></F>
+            <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Conditions</div>
             <div className="grid grid-cols-2 gap-3">
-              <F label="Date"><Input type="date" defaultValue="2026-11-13" /></F>
-              <F label="Species">
-                <Select defaultValue="whitetail"><SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent><SelectItem value="whitetail">Whitetail deer</SelectItem><SelectItem value="turkey">Turkey</SelectItem></SelectContent>
+              <F label="Wind direction">
+                <Select value={c.windDir} onValueChange={(v) => store.setConditions({ windDir: v })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>{WINDS.map((w) => <SelectItem key={w} value={w}>{w}</SelectItem>)}</SelectContent>
+                </Select>
+              </F>
+              <F label={`Wind ${c.windMph} mph`}>
+                <Input type="range" min={0} max={30} value={c.windMph} onChange={(e) => store.setConditions({ windMph: Number(e.target.value) })} />
+              </F>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <F label={`Temperature ${c.tempF}°F`}>
+                <Input type="range" min={-10} max={90} value={c.tempF} onChange={(e) => store.setConditions({ tempF: Number(e.target.value) })} />
+              </F>
+              <F label="Pressure trend">
+                <Select value={c.pressureTrend} onValueChange={(v) => store.setConditions({ pressureTrend: v as any })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="rising">Rising</SelectItem>
+                    <SelectItem value="steady">Steady</SelectItem>
+                    <SelectItem value="falling">Falling</SelectItem>
+                  </SelectContent>
                 </Select>
               </F>
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <F label="Start"><Input type="time" defaultValue="15:30" /></F>
-              <F label="End"><Input type="time" defaultValue="17:45" /></F>
+              <F label={`Pressure ${c.pressureInHg}"`}>
+                <Input type="number" step={0.01} value={c.pressureInHg} onChange={(e) => store.setConditions({ pressureInHg: Number(e.target.value) })} />
+              </F>
+              <F label="Precipitation">
+                <Select value={c.precipitation} onValueChange={(v) => store.setConditions({ precipitation: v as any })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {["None","Light rain","Rain","Snow"].map((x) => <SelectItem key={x} value={x}>{x}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </F>
             </div>
-            <F label="Stand / location">
-              <Select value={standId} onValueChange={setStandId}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>{stands.map((s) => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}</SelectContent>
-              </Select>
+            <div className="grid grid-cols-2 gap-3">
+              <F label="Time of day">
+                <Select value={c.timeOfDay} onValueChange={(v) => store.setConditions({ timeOfDay: v as any })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {["Morning","Midday","Evening","All-day"].map((x) => <SelectItem key={x} value={x}>{x}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </F>
+              <F label="Recent human pressure">
+                <Select value={c.pressure} onValueChange={(v) => store.setConditions({ pressure: v as any })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {["Low","Moderate","High"].map((x) => <SelectItem key={x} value={x}>{x}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </F>
+            </div>
+
+            <div className="pt-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">Plan</div>
+            <F label="Stand (optional — Freki picks the best if empty)">
+              {p.stands.length === 0 ? (
+                <Link to="/app/setup"><Button type="button" variant="outline" size="sm" className="w-full">Add a stand in Setup</Button></Link>
+              ) : (
+                <Select value={standId || "auto"} onValueChange={(v) => setStandId(v === "auto" ? "" : v)}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="auto">Freki chooses</SelectItem>
+                    {p.stands.map((s) => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              )}
             </F>
-            <F label="Planned access route"><Input defaultValue="North two-track" /></F>
-            <div className="grid grid-cols-2 gap-3">
-              <F label="Expected wind">
-                <Select value={wind} onValueChange={setWind}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>{["N","NE","E","SE","S","SW","W","NW"].map((w) => <SelectItem key={w} value={w}>{w}</SelectItem>)}</SelectContent>
-                </Select>
-              </F>
-              <F label="Recent pressure">
-                <Select value={pressure} onValueChange={setPressure}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>{["Low","Moderate","High"].map((p) => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent>
-                </Select>
-              </F>
-            </div>
-            <F label="Notes"><Textarea rows={2} placeholder="Anything Freki should know?" /></F>
-            <Button type="submit" className="w-full gap-2"><Target className="h-4 w-4" /> Evaluate hunt</Button>
+            <Button type="submit" className="w-full gap-2" disabled={p.stands.length === 0}>
+              <Target className="h-4 w-4" /> Evaluate hunt
+            </Button>
           </form>
 
           <div className="space-y-4">
             {!result ? (
               <div className="surface-panel p-10 text-center">
                 <Target className="mx-auto h-8 w-8 text-muted-foreground" />
-                <div className="mt-3 font-medium">Fill in the plan to evaluate</div>
-                <div className="text-sm text-muted-foreground">Freki will explain the why — including what it doesn't know.</div>
+                <div className="mt-3 font-medium">Enter conditions to evaluate</div>
+                <div className="text-sm text-muted-foreground">Freki will explain the reasoning — including its limitations.</div>
               </div>
             ) : (
               <Result r={result} />
@@ -117,15 +147,8 @@ function F({ label, children }: { label: string; children: React.ReactNode }) {
   return <div className="grid gap-1.5"><Label className="text-xs">{label}</Label>{children}</div>;
 }
 
-function Result({ r }: { r: any }) {
-  const positive = r.windFit
-    ? ["Wind carries scent away from the marsh bedding zone", "Daylight buck activity above baseline at this stand", "Cold front passed 30 hours ago"]
-    : ["Some historical evening movement at this location"];
-  const negative = r.windFit
-    ? ["Access route passes within 110 yards of the marsh bedding edge", "East ridge camera offline — coverage gap"]
-    : ["Wind fit is poor for this stand", "Scent likely reaches primary bedding", r.pressure === "High" ? "Recent property pressure is high" : ""].filter(Boolean);
-  const unknowns = ["Whether deer have shifted bedding toward the east ridge", "Overnight temperature drop's local effect"];
-
+function Result({ r }: { r: HuntRecommendation }) {
+  const c = useConditions();
   return (
     <>
       <div className="surface-panel overflow-hidden">
@@ -133,72 +156,62 @@ function Result({ r }: { r: any }) {
           <div className="flex items-center justify-between text-xs uppercase tracking-wider text-sidebar-foreground/60">
             Hunt Score
             <Badge className="border-0 bg-[var(--bronze)]/20 text-[var(--bronze)]">
-              {r.score >= 65 ? "Recommended" : r.score >= 40 ? "Marginal" : "Not recommended"}
+              {r.score >= 70 ? "Recommended" : r.score >= 50 ? "Marginal" : "Not recommended"}
             </Badge>
           </div>
-          <div className="mt-2 flex flex-wrap items-end gap-x-6 gap-y-2">
+          <div className="mt-2 grid gap-4 sm:grid-cols-[auto_1fr] items-end">
             <div>
               <div className="font-display text-5xl font-semibold text-[var(--bronze)] tabular-nums">{r.score}</div>
-              <div className="text-xs text-sidebar-foreground/60">out of 100</div>
+              <div className="text-xs text-sidebar-foreground/60">out of 100 · {r.confidence.toLowerCase()} confidence ({r.confidencePct}%)</div>
             </div>
             <div className="text-sm">
-              <div><span className="text-sidebar-foreground/60">Best window: </span>{r.window}</div>
-              <div><span className="text-sidebar-foreground/60">Stand: </span>{r.stand.name}</div>
+              <div className="font-medium">{r.headline}</div>
+              <div className="text-sidebar-foreground/70 mt-1">Window: {r.window}</div>
             </div>
           </div>
         </div>
         <div className="p-5">
-          <p className="text-sm leading-relaxed">
-            {r.windFit
-              ? `${r.stand.name} is a strong option for the final 90 minutes of daylight. The ${r.stand.bestWind[0]} wind carries scent away from the primary bedding zone, and daylight buck activity has increased over the last four days. The main concern is that the access route passes within 110 yards of the marsh bedding edge. Entering earlier may reduce the chance of disturbing deer already staged nearby.`
-              : `${r.stand.name} is not a strong fit for the current wind. Scent from the stand and access route likely reaches the primary bedding zone, and pressure conditions are ${r.pressure.toLowerCase()}. Consider an alternate stand with a better wind fit.`}
-          </p>
+          <p className="text-sm leading-relaxed">{r.reasoning}</p>
         </div>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <RiskCard icon={Wind} label="Wind fit" value={r.windFit ? "Good" : "Poor"} tone={r.windFit ? "good" : "bad"} />
-        <RiskCard icon={RouteIcon} label="Access risk" value={r.windFit ? "Low" : "High"} tone={r.windFit ? "good" : "bad"} />
-        <RiskCard icon={Bed} label="Bedding disturbance" value={r.windFit ? "Low–Moderate" : "High"} tone={r.windFit ? "warn" : "bad"} />
-        <RiskCard icon={Activity} label="Recent activity" value="Above baseline" tone="good" />
+      <div className="grid gap-3 grid-cols-2 sm:grid-cols-4">
+        <RiskCard icon={Wind} label="Wind fit" tone={r.score >= 60 ? "good" : "bad"} value={r.score >= 60 ? "Workable" : "Poor"} />
+        <RiskCard icon={RouteIcon} label="Access" tone={r.confidencePct > 60 ? "good" : "warn"} value={r.confidencePct > 60 ? "Clean" : "Risky"} />
+        <RiskCard icon={Bed} label="Bedding" tone={r.conflicting.some((s) => /bedding/i.test(s)) ? "bad" : "good"} value={r.conflicting.some((s) => /bedding/i.test(s)) ? "Risk" : "Protected"} />
+        <RiskCard icon={Activity} label="Signal" tone={r.supporting.some((s) => /detections/i.test(s)) ? "good" : "warn"} value={r.supporting.some((s) => /detections/i.test(s)) ? "Above baseline" : "Thin"} />
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-3">
-        <TruthScore
-          score={r.truth}
-          supporting={positive}
-          conflicting={negative}
-          uncertainty="Recent East Ridge camera downtime limits confidence."
-        />
-        <ReasoningBlock title="Why this could work" items={positive} tone="pos" />
-        <ReasoningBlock title="What could go wrong" items={negative} tone="neg" />
+      <div className="grid gap-4 md:grid-cols-2">
+        <ReasoningBlock title="Supporting evidence" items={r.supporting.length ? r.supporting : ["No strong supporting signals."]} tone="pos" icon={CheckCircle2} />
+        <ReasoningBlock title="Conflicting evidence" items={r.conflicting.length ? r.conflicting : ["No known conflicts."]} tone="neg" icon={AlertTriangle} />
       </div>
 
-      <ReasoningBlock title="What Freki does not know" items={unknowns} tone="mut" />
+      <ReasoningBlock title="What could change the conclusion" items={r.changers} tone="mut" icon={HelpCircle} />
 
-      <div className="surface-panel p-5">
-        <h3 className="font-display text-base font-semibold">Better alternatives</h3>
-        <div className="mt-3 grid gap-3 md:grid-cols-2">
-          {stands.filter((s) => s.id !== r.stand.id).slice(0, 2).map((s) => (
-            <div key={s.id} className="rounded-md border border-border p-3">
-              <div className="flex items-center justify-between">
-                <div className="font-medium">{s.name}</div>
-                <Badge variant="secondary">{s.bestWind.includes("NW") ? "Wind fit" : "Alternate"}</Badge>
+      {r.alternatives.length > 0 && (
+        <div className="surface-panel p-5">
+          <h3 className="font-display text-base font-semibold">Alternatives</h3>
+          <div className="mt-3 grid gap-3 md:grid-cols-2">
+            {r.alternatives.map((s) => (
+              <div key={s.id} className="rounded-md border border-border p-3">
+                <div className="flex items-center justify-between">
+                  <div className="font-medium">{s.name}</div>
+                  <Badge variant="secondary">{s.bestWind.includes(c.windDir) ? "Wind fit" : "Alternate"}</Badge>
+                </div>
+                <div className="text-xs text-muted-foreground">{s.notes || "—"}</div>
               </div>
-              <div className="text-xs text-muted-foreground">{s.notes}</div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
-      <div className="surface-panel p-5">
-        <h3 className="font-display text-base font-semibold">How to improve confidence</h3>
-        <ul className="mt-2 space-y-1.5 text-sm text-muted-foreground">
-          <li className="flex gap-2"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[var(--forest)]" /> Get the East Ridge camera back online.</li>
-          <li className="flex gap-2"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[var(--forest)]" /> Enter 30 minutes earlier to reduce bedding disturbance risk.</li>
-          <li className="flex gap-2"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[var(--forest)]" /> Add an observation from the lower creek crossing after this sit.</li>
-        </ul>
-      </div>
+      {r.recommendedStand && (
+        <div className="flex flex-wrap gap-2">
+          <LogHuntDialog r={r} />
+          <Link to="/app/history"><Button variant="outline" className="gap-2"><Save className="h-4 w-4" /> View history</Button></Link>
+        </div>
+      )}
     </>
   );
 }
@@ -208,20 +221,88 @@ function RiskCard({ icon: Icon, label, value, tone }: any) {
   return (
     <div className="surface-panel p-3">
       <div className="flex items-center gap-1.5 text-xs text-muted-foreground"><Icon className="h-3.5 w-3.5" />{label}</div>
-      <div className={`mt-1 font-display text-lg font-semibold ${t}`}>{value}</div>
+      <div className={`mt-1 font-display text-base font-semibold ${t}`}>{value}</div>
     </div>
   );
 }
 
-function ReasoningBlock({ title, items, tone }: { title: string; items: string[]; tone: "pos" | "neg" | "mut" }) {
+function ReasoningBlock({ title, items, tone, icon: Icon }: { title: string; items: string[]; tone: "pos" | "neg" | "mut"; icon: any }) {
   const c = tone === "pos" ? "text-[var(--forest)]" : tone === "neg" ? "text-destructive" : "text-muted-foreground";
-  const dot = tone === "pos" ? "bg-[var(--forest)]" : tone === "neg" ? "bg-destructive" : "bg-muted-foreground";
   return (
     <div className="surface-panel p-4">
-      <div className={`text-xs font-medium uppercase tracking-wider ${c}`}>{title}</div>
-      <ul className="mt-2 space-y-1 text-sm">
-        {items.map((s) => <li key={s} className="flex gap-2"><span className={`mt-1.5 h-1 w-1 shrink-0 rounded-full ${dot}`} />{s}</li>)}
+      <div className={`text-xs font-medium uppercase tracking-wider ${c} flex items-center gap-1.5`}><Icon className="h-3.5 w-3.5" />{title}</div>
+      <ul className="mt-2 space-y-1.5 text-sm">
+        {items.map((s, i) => <li key={i} className="flex gap-2"><span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-current opacity-60" />{s}</li>)}
       </ul>
     </div>
+  );
+}
+
+function LogHuntDialog({ r }: { r: HuntRecommendation }) {
+  const c = useConditions();
+  const [open, setOpen] = useState(false);
+  const [entry, setEntry] = useState("15:30");
+  const [exit, setExit] = useState("17:45");
+  const [outcome, setOutcome] = useState<"Productive" | "Neutral" | "Unproductive" | "Pending">("Pending");
+  const [sightings, setSightings] = useState(0);
+  const [encounters, setEncounters] = useState("");
+  const [shots, setShots] = useState(0);
+  const [harvest, setHarvest] = useState("None");
+  const [notes, setNotes] = useState("");
+
+  function save(e: React.FormEvent) {
+    e.preventDefault();
+    if (!r.recommendedStand) return;
+    store.addHunt({
+      date: new Date().toLocaleDateString(undefined, { month: "short", day: "numeric" }),
+      location: r.recommendedStand.name,
+      entry, exit,
+      wind: `${c.windDir} ${c.windMph}`,
+      weather: `${c.precipitation === "None" ? "Clear" : c.precipitation}, ${c.tempF}°F`,
+      sightings, encounters: encounters || "—", shots,
+      harvest, pressure: c.pressure,
+      notes, originalScore: r.score, outcome,
+    });
+    toast.success(outcome === "Pending" ? "Hunt planned — record the result after the sit" : "Hunt recorded");
+    setOpen(false);
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button className="gap-2"><Save className="h-4 w-4" /> Save & record hunt</Button>
+      </DialogTrigger>
+      <DialogContent className="max-w-lg max-h-[85dvh] overflow-y-auto">
+        <DialogHeader><DialogTitle>Record hunt at {r.recommendedStand?.name}</DialogTitle></DialogHeader>
+        <form onSubmit={save} className="grid gap-3">
+          <div className="grid grid-cols-2 gap-3">
+            <F label="Entry"><Input type="time" value={entry} onChange={(e) => setEntry(e.target.value)} /></F>
+            <F label="Exit"><Input type="time" value={exit} onChange={(e) => setExit(e.target.value)} /></F>
+          </div>
+          <F label="Outcome">
+            <Select value={outcome} onValueChange={(v) => setOutcome(v as any)}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Pending">Pending (log now, update later)</SelectItem>
+                <SelectItem value="Productive">Productive</SelectItem>
+                <SelectItem value="Neutral">Neutral</SelectItem>
+                <SelectItem value="Unproductive">Unproductive</SelectItem>
+              </SelectContent>
+            </Select>
+          </F>
+          <div className="grid grid-cols-3 gap-3">
+            <F label="Sightings"><Input type="number" min={0} value={sightings} onChange={(e) => setSightings(Number(e.target.value))} /></F>
+            <F label="Shots"><Input type="number" min={0} value={shots} onChange={(e) => setShots(Number(e.target.value))} /></F>
+            <F label="Harvest"><Input value={harvest} onChange={(e) => setHarvest(e.target.value)} /></F>
+          </div>
+          <F label="Encounters"><Input value={encounters} onChange={(e) => setEncounters(e.target.value)} placeholder="e.g. 2 does, 1 young buck" /></F>
+          <F label="Notes"><Textarea rows={3} value={notes} onChange={(e) => setNotes(e.target.value)} /></F>
+          <DialogFooter>
+            <Button type="button" variant="ghost" onClick={() => setOpen(false)}>Cancel</Button>
+            <Button type="submit">Save hunt</Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }
