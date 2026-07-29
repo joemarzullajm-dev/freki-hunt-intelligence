@@ -134,11 +134,14 @@ export type EmergencyInfo = {
   vehicleDescription: string;
 };
 
+export type PublicLandParticipation = "unset" | "enabled" | "declined";
+
 export type Safety = {
   sharingEnabled: boolean;
   contacts: TrustedContact[];
   publicLandMode: PublicLandMode;
   onPublicLand: boolean;
+  publicLandParticipation: PublicLandParticipation;
   nearbyHunters: NearbyHunter[];
   nearbySharingCount: number;
   emergency: EmergencyInfo;
@@ -173,6 +176,7 @@ const defaultSafety: Safety = {
   ],
   publicLandMode: "nearby",
   onPublicLand: false,
+  publicLandParticipation: "unset",
   nearbySharingCount: 8,
   nearbyHunters: [
     { id: "nh-1", username: "Mike R.", distanceMiles: 0.4, direction: "Northwest" },
@@ -338,7 +342,19 @@ export const store = {
     set((s) => ({ ...s, safety: { ...s.safety, publicLandMode: mode } }));
   },
   setOnPublicLand(v: boolean) {
-    set((s) => ({ ...s, safety: { ...s.safety, onPublicLand: v } }));
+    set((s) => ({
+      ...s,
+      safety: {
+        ...s.safety,
+        onPublicLand: v,
+        // Reset opt-in state on transition so the user is asked again next time.
+        publicLandParticipation:
+          s.safety.onPublicLand === v ? s.safety.publicLandParticipation : "unset",
+      },
+    }));
+  },
+  setPublicLandParticipation(p: PublicLandParticipation) {
+    set((s) => ({ ...s, safety: { ...s.safety, publicLandParticipation: p } }));
   },
   setEmergencyInfo(patch: Partial<EmergencyInfo>) {
     set((s) => ({ ...s, safety: { ...s.safety, emergency: { ...s.safety.emergency, ...patch } } }));
