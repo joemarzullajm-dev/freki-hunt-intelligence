@@ -13,6 +13,7 @@ import {
 } from "@/lib/freki-data";
 import { Link } from "@tanstack/react-router";
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis, CartesianGrid } from "recharts";
+import { LiveSharingBanner, PropertySafetyCard } from "@/components/property-safety";
 
 export const Route = createFileRoute("/app/dashboard")({
   head: () => ({
