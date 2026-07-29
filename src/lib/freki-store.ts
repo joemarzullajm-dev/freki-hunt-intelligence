@@ -231,6 +231,10 @@ export function useConditions(): Conditions {
   return useFreki((s) => s.conditions);
 }
 
+export function useSafety(): Safety {
+  return useFreki((s) => s.safety);
+}
+
 export const store = {
   // properties
   addProperty(input: Omit<Property, "id" | "stands" | "cameras" | "food" | "bedding" | "access" | "observations" | "hunts">) {
