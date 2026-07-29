@@ -134,11 +134,14 @@ export type EmergencyInfo = {
   vehicleDescription: string;
 };
 
+export type PublicLandParticipation = "unset" | "enabled" | "declined";
+
 export type Safety = {
   sharingEnabled: boolean;
   contacts: TrustedContact[];
   publicLandMode: PublicLandMode;
   onPublicLand: boolean;
+  publicLandParticipation: PublicLandParticipation;
   nearbyHunters: NearbyHunter[];
   nearbySharingCount: number;
   emergency: EmergencyInfo;
