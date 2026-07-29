@@ -340,6 +340,9 @@ export const store = {
   setOnPublicLand(v: boolean) {
     set((s) => ({ ...s, safety: { ...s.safety, onPublicLand: v } }));
   },
+  setEmergencyInfo(patch: Partial<EmergencyInfo>) {
+    set((s) => ({ ...s, safety: { ...s.safety, emergency: { ...s.safety.emergency, ...patch } } }));
+  },
 
   // generic collection helpers on active property
   _mutateActive(fn: (p: Property) => Property) {
