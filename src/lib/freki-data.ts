@@ -104,6 +104,16 @@ export const cameras: Camera[] = [
   { id: "cam-8", name: "Hidden Plot", status: "Online", battery: 76, lastCheck: "4h ago", detections24h: 8, daylightPct: 38, targetActivity: "Above", x: 64, y: 32 },
 ];
 
+export const cameraTotals = {
+  online: cameras.filter((c) => c.status === "Online").length,
+  offline: cameras.filter((c) => c.status !== "Online").length,
+  detections24h: cameras.reduce((n, c) => n + c.detections24h, 0),
+  daylight24h: cameras.reduce(
+    (n, c) => n + Math.round((c.detections24h * c.daylightPct) / 100),
+    0,
+  ),
+};
+
 export type Detection = {
   id: string;
   cameraId: string;
