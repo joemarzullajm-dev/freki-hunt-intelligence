@@ -18,11 +18,28 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { MapPin, Plus, Pencil, Trash2, ShieldCheck, Radio } from "lucide-react";
+import {
+  MapPin,
+  Plus,
+  Pencil,
+  Trash2,
+  ShieldCheck,
+  Radio,
+  Users,
+  Eye,
+  EyeOff,
+  Compass,
+  ChevronRight,
+} from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { useSafety, store, type TrustedContact } from "@/lib/freki-store";
+import {
+  useSafety,
+  store,
+  type TrustedContact,
+  type PublicLandMode,
+} from "@/lib/freki-store";
 
 export const Route = createFileRoute("/app/safety")({
   head: () => ({
