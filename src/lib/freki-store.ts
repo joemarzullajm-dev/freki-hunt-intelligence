@@ -312,6 +312,12 @@ export const store = {
   removeContact(id: string) {
     set((s) => ({ ...s, safety: { ...s.safety, contacts: s.safety.contacts.filter((c) => c.id !== id) } }));
   },
+  setPublicLandMode(mode: PublicLandMode) {
+    set((s) => ({ ...s, safety: { ...s.safety, publicLandMode: mode } }));
+  },
+  setOnPublicLand(v: boolean) {
+    set((s) => ({ ...s, safety: { ...s.safety, onPublicLand: v } }));
+  },
 
   // generic collection helpers on active property
   _mutateActive(fn: (p: Property) => Property) {
