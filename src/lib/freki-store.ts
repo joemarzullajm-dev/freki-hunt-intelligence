@@ -184,6 +184,16 @@ const defaultSafety: Safety = {
     { id: "nh-7", username: "Chris W.", distanceMiles: 2.4, direction: "Southeast" },
     { id: "nh-8", username: "Dan H.", distanceMiles: 2.9, direction: "North" },
   ],
+  emergency: {
+    fullName: "",
+    bloodType: "",
+    allergies: "",
+    medications: "",
+    medicalNotes: "",
+    emergencyContactName: "",
+    emergencyContactPhone: "",
+    vehicleDescription: "",
+  },
 };
 
 function seedProperties(): Property[] {
