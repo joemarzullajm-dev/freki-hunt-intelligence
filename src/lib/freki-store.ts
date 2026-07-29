@@ -106,9 +106,30 @@ export type TrustedContact = {
   sharing: boolean;
 };
 
+export type PublicLandMode = "invisible" | "nearby" | "trusted";
+
+export type NearbyHunter = {
+  id: string;
+  username: string;
+  distanceMiles: number;
+  direction:
+    | "North"
+    | "Northeast"
+    | "East"
+    | "Southeast"
+    | "South"
+    | "Southwest"
+    | "West"
+    | "Northwest";
+};
+
 export type Safety = {
   sharingEnabled: boolean;
   contacts: TrustedContact[];
+  publicLandMode: PublicLandMode;
+  onPublicLand: boolean;
+  nearbyHunters: NearbyHunter[];
+  nearbySharingCount: number;
 };
 
 type State = {
@@ -137,6 +158,19 @@ const defaultSafety: Safety = {
     { id: "tc-1", name: "Sarah Halden", relationship: "Spouse", sharing: true },
     { id: "tc-2", name: "Mike Reeves", relationship: "Hunting Partner", sharing: true },
     { id: "tc-3", name: "Dad", relationship: "Father", sharing: false },
+  ],
+  publicLandMode: "nearby",
+  onPublicLand: false,
+  nearbySharingCount: 8,
+  nearbyHunters: [
+    { id: "nh-1", username: "Mike R.", distanceMiles: 0.4, direction: "Northwest" },
+    { id: "nh-2", username: "Sarah B.", distanceMiles: 0.8, direction: "East" },
+    { id: "nh-3", username: "John D.", distanceMiles: 1.2, direction: "South" },
+    { id: "nh-4", username: "Ellen K.", distanceMiles: 1.5, direction: "Northeast" },
+    { id: "nh-5", username: "Trevor P.", distanceMiles: 1.8, direction: "Southwest" },
+    { id: "nh-6", username: "Rae M.", distanceMiles: 2.1, direction: "West" },
+    { id: "nh-7", username: "Chris W.", distanceMiles: 2.4, direction: "Southeast" },
+    { id: "nh-8", username: "Dan H.", distanceMiles: 2.9, direction: "North" },
   ],
 };
 
