@@ -171,22 +171,22 @@ function MapCanvas({ layers, onSelect }: { layers: Record<string, boolean>; onSe
 
       {/* Markers */}
       {layers.bedding && bedding.map((f) => (
-        <MarkerDot key={f.id} feature={f} color="bg-[var(--forest)]" icon={Bed} onSelect={onSelect} />
+        <MarkerDot key={f.id} feature={f} color="bg-[var(--forest)] text-white" icon={Bed} onSelect={onSelect} />
       ))}
       {layers.food && food.map((f) => (
-        <MarkerDot key={f.id} feature={f} color="bg-yellow-600" icon={Wheat} onSelect={onSelect} />
+        <MarkerDot key={f.id} feature={f} color="bg-yellow-600 text-white" icon={Wheat} onSelect={onSelect} />
       ))}
       {layers.water && water.map((f) => (
-        <MarkerDot key={f.id} feature={f} color="bg-blue-500" icon={Droplets} onSelect={onSelect} />
+        <MarkerDot key={f.id} feature={f} color="bg-blue-500 text-white" icon={Droplets} onSelect={onSelect} />
       ))}
       {layers.access && access.map((f) => (
-        <MarkerDot key={f.id} feature={f} color="bg-stone-500" icon={RouteIcon} onSelect={onSelect} />
+        <MarkerDot key={f.id} feature={f} color="bg-stone-500 text-white" icon={RouteIcon} onSelect={onSelect} />
       ))}
       {layers.stands && stands.map((s) => (
         <MarkerDot key={s.id} feature={{ ...s, type: "Stand", note: s.notes }} color="bg-foreground text-background" icon={MapPin} onSelect={onSelect} />
       ))}
       {layers.cameras && cameras.map((c) => (
-        <MarkerDot key={c.id} feature={{ ...c, type: "Camera", note: `${c.detections24h} detections in 24h · ${c.status}` }} color="bg-[var(--bronze)]" icon={CameraIcon} onSelect={onSelect} />
+        <MarkerDot key={c.id} feature={{ ...c, type: "Camera", note: `${c.detections24h} detections in 24h · ${c.status}` }} color="bg-[var(--bronze)] text-white" icon={CameraIcon} onSelect={onSelect} />
       ))}
     </div>
   );
