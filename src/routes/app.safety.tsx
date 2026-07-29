@@ -187,6 +187,10 @@ function SafetyPage() {
             )}
           </section>
 
+          <PublicLandAwareness />
+
+
+
           <p className="px-1 text-xs text-muted-foreground">
             Freki stores this list in your browser for the demo. In production,
             location updates would only be transmitted while sharing is active
