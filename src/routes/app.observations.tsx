@@ -41,18 +41,25 @@ function Observations() {
         actions={<NewObservationDialog />}
       />
       <PageBody>
+        <div className="mb-4 rounded-md border border-dashed border-border bg-card/40 p-3 text-xs text-muted-foreground">
+          Showing <strong className="text-foreground">{observations.length}</strong> recent observations. This demo property has <strong className="text-foreground">18</strong> logged this season.
+        </div>
+
         <div className="mb-4 flex flex-wrap gap-2">
           <div className="relative">
             <Search className="pointer-events-none absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search observations" className="pl-8 w-64" />
+            <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search observations" className="pl-8 w-64" aria-label="Search observations" />
           </div>
           <Select value={type} onValueChange={setType}>
-            <SelectTrigger className="w-44"><SelectValue /></SelectTrigger>
+            <SelectTrigger className="w-44" aria-label="Filter by type"><SelectValue /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All types</SelectItem>
               {types.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
             </SelectContent>
           </Select>
+          {(q || type !== "all") && (
+            <Button variant="ghost" size="sm" onClick={() => { setQ(""); setType("all"); }}>Clear filters</Button>
+          )}
         </div>
 
         <Tabs defaultValue="list">
