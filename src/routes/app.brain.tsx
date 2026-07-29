@@ -47,14 +47,21 @@ const evidenceColor: Record<string, string> = {
   Unknown: "bg-muted text-muted-foreground",
 };
 
+const filters: { key: string; label: string; match: (cat: string) => boolean }[] = [
+  { key: "all", label: "All statements", match: () => true },
+  { key: "corridors", label: "Travel corridors", match: (c) => /travel|corridor/i.test(c) },
+  { key: "access", label: "Human access", match: (c) => /access|pressure/i.test(c) },
+  { key: "coverage", label: "Camera coverage", match: (c) => /coverage|camera/i.test(c) },
+  { key: "bedding", label: "Bedding", match: (c) => /bedding/i.test(c) },
+  { key: "seasonal", label: "Seasonal", match: (c) => /seasonal/i.test(c) },
+  { key: "uncertainty", label: "Uncertainty", match: (c) => /uncertainty|unknown/i.test(c) },
+];
+
 function Brain() {
   const [active, setActive] = useState("all");
 
-  const filtered = active === "all" ? brainStatements :
-    brainStatements.filter((s) =>
-      s.category.toLowerCase().includes(active) ||
-      (active === "corridors" && s.category.toLowerCase().includes("travel"))
-    );
+  const activeFilter = filters.find((f) => f.key === active) ?? filters[0];
+  const filtered = brainStatements.filter((s) => activeFilter.match(s.category));
 
   return (
     <>
@@ -77,16 +84,22 @@ function Brain() {
 
           <TabsContent value="statements" className="mt-6">
             <div className="mb-4 flex flex-wrap gap-2">
-              {["all", "corridors", "access", "coverage", "bedding", "seasonal", "uncertainty"].map((c) => (
+              {filters.map((f) => (
                 <button
-                  key={c}
-                  onClick={() => setActive(c)}
-                  className={`rounded-full border px-3 py-1 text-xs capitalize transition ${
-                    active === c ? "border-foreground bg-foreground text-background" : "border-border hover:border-foreground/40"
+                  key={f.key}
+                  onClick={() => setActive(f.key)}
+                  className={`rounded-full border px-3 py-1 text-xs transition ${
+                    active === f.key ? "border-foreground bg-foreground text-background" : "border-border hover:border-foreground/40"
                   }`}
-                >{c === "all" ? "All statements" : c}</button>
+                >{f.label}</button>
               ))}
             </div>
+
+            {filtered.length === 0 && (
+              <div className="surface-panel p-8 text-center text-sm text-muted-foreground">
+                No statements in this category yet.
+              </div>
+            )}
 
             <div className="grid gap-4 lg:grid-cols-2">
               {filtered.map((s) => (
