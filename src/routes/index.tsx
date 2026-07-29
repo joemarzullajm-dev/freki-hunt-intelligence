@@ -47,7 +47,7 @@ function Landing() {
         </nav>
         <div className="flex items-center gap-2">
           <Link to="/demo"><Button variant="ghost" size="sm">Sign in</Button></Link>
-          <Link to="/demo"><Button size="sm">Explore demo</Button></Link>
+          <Link to="/app/dashboard"><Button size="sm">Open demo</Button></Link>
         </div>
       </header>
 
