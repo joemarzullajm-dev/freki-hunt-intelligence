@@ -114,8 +114,8 @@ function MetricsGrid() {
     { icon: Thermometer, label: "Temperature", value: `${conditions.tempF}°F`, sub: "cool" },
     { icon: Gauge, label: "Pressure", value: `${conditions.pressureInHg}"`, sub: conditions.pressureTrend },
     { icon: Moon, label: "Moon", value: `${Math.round(conditions.moonIllum * 100)}%`, sub: conditions.moonPhase },
-    { icon: Camera, label: "Camera 24h", value: `${conditions.cameraActivity24h}`, sub: "detections" },
-    { icon: Sun, label: "Daylight", value: `${conditions.daylightActivity}`, sub: "detections" },
+    { icon: Camera, label: "Camera 24h", value: `${cameraTotals.detections24h}`, sub: `${cameraTotals.online}/${cameras.length} online` },
+    { icon: Sun, label: "Daylight", value: `${cameraTotals.daylight24h}`, sub: "detections" },
     { icon: Users, label: "Disturbance", value: conditions.disturbance, sub: "past 48h" },
     { icon: Activity, label: "Truth Score", value: `${huntOutlook.truthScore}`, sub: "moderate" },
   ];
