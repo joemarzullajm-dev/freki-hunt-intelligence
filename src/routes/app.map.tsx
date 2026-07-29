@@ -39,6 +39,18 @@ const access: Feature[] = [
   { id: "a3", type: "Access", name: "West field edge", x: 12, y: 55 },
 ];
 
+const layerLabels: Record<string, string> = {
+  stands: "Stands",
+  cameras: "Cameras",
+  bedding: "Bedding",
+  food: "Food",
+  water: "Water",
+  access: "Access routes",
+  wind: "Wind indicator",
+  boundary: "Property boundary",
+  corridors: "Travel corridors",
+};
+
 function MapPage() {
   const [layers, setLayers] = useState({
     stands: true, cameras: true, bedding: true, food: true, water: true, access: true, wind: true, boundary: true, corridors: true,
@@ -58,9 +70,9 @@ function MapPage() {
             <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Layers</div>
             <div className="mt-3 space-y-2 text-sm">
               {Object.entries(layers).map(([k, v]) => (
-                <label key={k} className="flex items-center justify-between capitalize">
-                  {k}
-                  <Switch checked={v} onCheckedChange={(c) => setLayers((prev) => ({ ...prev, [k]: c }))} />
+                <label key={k} className="flex items-center justify-between gap-3">
+                  <span>{layerLabels[k] ?? k}</span>
+                  <Switch checked={v} onCheckedChange={(c) => setLayers((prev) => ({ ...prev, [k]: c }))} aria-label={`Toggle ${layerLabels[k] ?? k}`} />
                 </label>
               ))}
             </div>
