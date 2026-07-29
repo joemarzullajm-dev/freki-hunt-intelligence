@@ -28,12 +28,14 @@ function Properties() {
 
   return (
     <>
+      <LiveSharingBanner />
       <PageHeader
         title="Properties"
         description="Create a new property or open an existing one. Everything is saved to your browser."
         actions={<NewPropertyDialog />}
       />
       <PageBody>
+        <PropertySafetyCard className="mb-6 max-w-md" />
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {properties.map((p) => {
             const active = p.id === activeId;
