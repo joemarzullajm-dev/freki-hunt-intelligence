@@ -176,6 +176,7 @@ const defaultSafety: Safety = {
   ],
   publicLandMode: "nearby",
   onPublicLand: false,
+  publicLandParticipation: "unset",
   nearbySharingCount: 8,
   nearbyHunters: [
     { id: "nh-1", username: "Mike R.", distanceMiles: 0.4, direction: "Northwest" },
