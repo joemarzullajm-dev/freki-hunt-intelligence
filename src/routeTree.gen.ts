@@ -13,6 +13,9 @@ import { Route as DemoRouteImport } from './routes/demo'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppIndexRouteImport } from './routes/app.index'
+import { Route as AppPropertiesRouteImport } from './routes/app.properties'
+import { Route as AppDashboardRouteImport } from './routes/app.dashboard'
+import { Route as AppBrainRouteImport } from './routes/app.brain'
 
 const DemoRoute = DemoRouteImport.update({
   id: '/demo',
@@ -34,16 +37,37 @@ const AppIndexRoute = AppIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppRoute,
 } as any)
+const AppPropertiesRoute = AppPropertiesRouteImport.update({
+  id: '/properties',
+  path: '/properties',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppDashboardRoute = AppDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppBrainRoute = AppBrainRouteImport.update({
+  id: '/brain',
+  path: '/brain',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/demo': typeof DemoRoute
+  '/app/brain': typeof AppBrainRoute
+  '/app/dashboard': typeof AppDashboardRoute
+  '/app/properties': typeof AppPropertiesRoute
   '/app/': typeof AppIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/demo': typeof DemoRoute
+  '/app/brain': typeof AppBrainRoute
+  '/app/dashboard': typeof AppDashboardRoute
+  '/app/properties': typeof AppPropertiesRoute
   '/app': typeof AppIndexRoute
 }
 export interface FileRoutesById {
@@ -51,14 +75,38 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/demo': typeof DemoRoute
+  '/app/brain': typeof AppBrainRoute
+  '/app/dashboard': typeof AppDashboardRoute
+  '/app/properties': typeof AppPropertiesRoute
   '/app/': typeof AppIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/app' | '/demo' | '/app/'
+  fullPaths:
+    | '/'
+    | '/app'
+    | '/demo'
+    | '/app/brain'
+    | '/app/dashboard'
+    | '/app/properties'
+    | '/app/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/demo' | '/app'
-  id: '__root__' | '/' | '/app' | '/demo' | '/app/'
+  to:
+    | '/'
+    | '/demo'
+    | '/app/brain'
+    | '/app/dashboard'
+    | '/app/properties'
+    | '/app'
+  id:
+    | '__root__'
+    | '/'
+    | '/app'
+    | '/demo'
+    | '/app/brain'
+    | '/app/dashboard'
+    | '/app/properties'
+    | '/app/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -97,14 +145,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/properties': {
+      id: '/app/properties'
+      path: '/properties'
+      fullPath: '/app/properties'
+      preLoaderRoute: typeof AppPropertiesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/dashboard': {
+      id: '/app/dashboard'
+      path: '/dashboard'
+      fullPath: '/app/dashboard'
+      preLoaderRoute: typeof AppDashboardRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/brain': {
+      id: '/app/brain'
+      path: '/brain'
+      fullPath: '/app/brain'
+      preLoaderRoute: typeof AppBrainRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
 interface AppRouteChildren {
+  AppBrainRoute: typeof AppBrainRoute
+  AppDashboardRoute: typeof AppDashboardRoute
+  AppPropertiesRoute: typeof AppPropertiesRoute
   AppIndexRoute: typeof AppIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppBrainRoute: AppBrainRoute,
+  AppDashboardRoute: AppDashboardRoute,
+  AppPropertiesRoute: AppPropertiesRoute,
   AppIndexRoute: AppIndexRoute,
 }
 
