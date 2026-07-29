@@ -342,7 +342,19 @@ export const store = {
     set((s) => ({ ...s, safety: { ...s.safety, publicLandMode: mode } }));
   },
   setOnPublicLand(v: boolean) {
-    set((s) => ({ ...s, safety: { ...s.safety, onPublicLand: v } }));
+    set((s) => ({
+      ...s,
+      safety: {
+        ...s.safety,
+        onPublicLand: v,
+        // Reset opt-in state on transition so the user is asked again next time.
+        publicLandParticipation:
+          s.safety.onPublicLand === v ? s.safety.publicLandParticipation : "unset",
+      },
+    }));
+  },
+  setPublicLandParticipation(p: PublicLandParticipation) {
+    set((s) => ({ ...s, safety: { ...s.safety, publicLandParticipation: p } }));
   },
   setEmergencyInfo(patch: Partial<EmergencyInfo>) {
     set((s) => ({ ...s, safety: { ...s.safety, emergency: { ...s.safety.emergency, ...patch } } }));
