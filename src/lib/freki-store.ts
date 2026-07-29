@@ -174,7 +174,7 @@ function seedProperties(): Property[] {
 }
 
 function initialState(): State {
-  return { activeId: seedProperty.id, properties: seedProperties(), conditions: defaultConditions };
+  return { activeId: seedProperty.id, properties: seedProperties(), conditions: defaultConditions, safety: { ...defaultSafety, contacts: defaultSafety.contacts.map((c) => ({ ...c })) } };
 }
 
 function load(): State {
@@ -182,9 +182,15 @@ function load(): State {
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) return initialState();
-    const parsed = JSON.parse(raw) as State;
+    const parsed = JSON.parse(raw) as Partial<State>;
     if (!parsed.properties?.length) return initialState();
-    return { ...initialState(), ...parsed, conditions: { ...defaultConditions, ...parsed.conditions } };
+    const base = initialState();
+    return {
+      ...base,
+      ...parsed,
+      conditions: { ...defaultConditions, ...(parsed.conditions ?? {}) },
+      safety: { ...base.safety, ...(parsed.safety ?? {}) },
+    } as State;
   } catch {
     return initialState();
   }
