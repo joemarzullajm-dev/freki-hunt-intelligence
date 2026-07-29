@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as DemoRouteImport } from './routes/demo'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
@@ -25,6 +26,11 @@ import { Route as AppCamerasRouteImport } from './routes/app.cameras'
 import { Route as AppBrainRouteImport } from './routes/app.brain'
 import { Route as AppAiRouteImport } from './routes/app.ai'
 
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DemoRoute = DemoRouteImport.update({
   id: '/demo',
   path: '/demo',
@@ -105,6 +111,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/demo': typeof DemoRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/app/ai': typeof AppAiRoute
   '/app/brain': typeof AppBrainRoute
   '/app/cameras': typeof AppCamerasRoute
@@ -121,6 +128,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/demo': typeof DemoRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/app/ai': typeof AppAiRoute
   '/app/brain': typeof AppBrainRoute
   '/app/cameras': typeof AppCamerasRoute
@@ -139,6 +147,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/demo': typeof DemoRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/app/ai': typeof AppAiRoute
   '/app/brain': typeof AppBrainRoute
   '/app/cameras': typeof AppCamerasRoute
@@ -158,6 +167,7 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/demo'
+    | '/sitemap.xml'
     | '/app/ai'
     | '/app/brain'
     | '/app/cameras'
@@ -174,6 +184,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/demo'
+    | '/sitemap.xml'
     | '/app/ai'
     | '/app/brain'
     | '/app/cameras'
@@ -191,6 +202,7 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/demo'
+    | '/sitemap.xml'
     | '/app/ai'
     | '/app/brain'
     | '/app/cameras'
@@ -209,10 +221,18 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRoute: typeof AppRouteWithChildren
   DemoRoute: typeof DemoRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/demo': {
       id: '/demo'
       path: '/demo'
@@ -357,6 +377,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
   DemoRoute: DemoRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
