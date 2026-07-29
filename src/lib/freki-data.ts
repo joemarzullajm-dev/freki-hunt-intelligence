@@ -35,8 +35,6 @@ export const conditions = {
   pressureTrend: "falling",
   moonIllum: 0.42,
   moonPhase: "Waning Gibbous",
-  cameraActivity24h: 22,
-  daylightActivity: 6,
   disturbance: "Low",
   sunset: "5:41 PM",
   sunrise: "6:52 AM",
@@ -105,6 +103,16 @@ export const cameras: Camera[] = [
   { id: "cam-7", name: "South Gate", status: "Low battery", battery: 22, lastCheck: "1d ago", detections24h: 3, daylightPct: 18, targetActivity: "Below", x: 42, y: 84 },
   { id: "cam-8", name: "Hidden Plot", status: "Online", battery: 76, lastCheck: "4h ago", detections24h: 8, daylightPct: 38, targetActivity: "Above", x: 64, y: 32 },
 ];
+
+export const cameraTotals = {
+  online: cameras.filter((c) => c.status === "Online").length,
+  offline: cameras.filter((c) => c.status !== "Online").length,
+  detections24h: cameras.reduce((n, c) => n + c.detections24h, 0),
+  daylight24h: cameras.reduce(
+    (n, c) => n + Math.round((c.detections24h * c.daylightPct) / 100),
+    0,
+  ),
+};
 
 export type Detection = {
   id: string;

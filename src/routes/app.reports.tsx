@@ -99,7 +99,7 @@ function Reports() {
             </Section>
 
             <Section title="Camera activity">
-              <p>22 detections in the last 24 hours across 7 cameras. Daylight share held at 27%. East Ridge contributed zero detections.</p>
+              <p>58 detections in the last 24 hours across 7 online cameras — roughly 43% during daylight. East Ridge is offline and contributed zero, so the eastern quadrant is undercounted.</p>
             </Section>
 
             <Section title="Recent observations">

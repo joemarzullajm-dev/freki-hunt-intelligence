@@ -115,9 +115,12 @@ function Ask() {
   const [messages, setMessages] = useState<Msg[]>([
     { role: "assistant", content: "I'm Freki. I can reason about Black Ridge Farm's cameras, observations, hunt history, and current conditions. Ask me something — I'll show my evidence." },
   ]);
+  const scrollerRef = useRef<HTMLDivElement>(null);
   const [input, setInput] = useState("");
-  const endRef = useRef<HTMLDivElement>(null);
-  useEffect(() => { endRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
+  useEffect(() => {
+    const el = scrollerRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [messages]);
 
   function send(text: string) {
     if (!text.trim()) return;
@@ -136,8 +139,8 @@ function Ask() {
       />
       <PageBody>
         <div className="grid gap-6 lg:grid-cols-[1fr_280px]">
-          <div className="surface-panel flex flex-col min-h-[60dvh]">
-            <div className="flex-1 space-y-4 overflow-y-auto p-5">
+          <div className="surface-panel flex flex-col h-[70dvh] lg:h-[75dvh]">
+            <div ref={scrollerRef} className="flex-1 space-y-4 overflow-y-auto p-5">
               {messages.map((m, i) => (
                 <div key={i} className={m.role === "user" ? "flex justify-end" : "flex gap-3"}>
                   {m.role === "assistant" && (
@@ -147,11 +150,16 @@ function Ask() {
                   )}
                   <div className={`max-w-2xl ${m.role === "user" ? "rounded-2xl bg-foreground text-background px-4 py-2 text-sm" : "space-y-2"}`}>
                     <p className="text-sm leading-relaxed">{m.content}</p>
-                    {m.role === "assistant" && (m.supporting || m.conflicting) && (
+                    {m.role === "assistant" && typeof m.confidence === "number" && (
                       <TruthScore
-                        score={m.confidence ?? 60}
+                        score={m.confidence}
                         supporting={m.supporting}
                         conflicting={m.conflicting}
+                        uncertainty={
+                          (!m.supporting || m.supporting.length === 0) && (!m.conflicting || m.conflicting.length === 0)
+                            ? "Limited direct evidence for this question — treat as a working answer, not a conclusion."
+                            : undefined
+                        }
                         compact
                       />
                     )}
@@ -163,7 +171,6 @@ function Ask() {
                   </div>
                 </div>
               ))}
-              <div ref={endRef} />
             </div>
             <form
               onSubmit={(e) => { e.preventDefault(); send(input); }}
