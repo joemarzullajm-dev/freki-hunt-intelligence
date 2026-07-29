@@ -18,8 +18,9 @@ import {
   Menu,
   X,
   Wind,
+  Wrench,
+  Plus,
 } from "lucide-react";
-import { property, conditions } from "@/lib/freki-data";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,10 +30,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import { useActiveProperty, useProperties, useConditions, useFreki, store } from "@/lib/freki-store";
 
 const nav = [
   { to: "/app/dashboard", label: "Overview", icon: LayoutDashboard },
   { to: "/app/properties", label: "Properties", icon: Trees },
+  { to: "/app/setup", label: "Setup", icon: Wrench },
   { to: "/app/brain", label: "Property Brain", icon: Brain },
   { to: "/app/map", label: "Map", icon: Map },
   { to: "/app/cameras", label: "Cameras", icon: Camera },
@@ -44,11 +47,19 @@ const nav = [
   { to: "/app/settings", label: "Settings", icon: Settings },
 ];
 
-const mobileNav = nav.slice(0, 5);
+const mobileNav = [
+  { to: "/app/dashboard", label: "Overview", icon: LayoutDashboard },
+  { to: "/app/setup", label: "Setup", icon: Wrench },
+  { to: "/app/evaluation", label: "Evaluate", icon: Target },
+  { to: "/app/observations", label: "Log", icon: Eye },
+  { to: "/app/history", label: "History", icon: History },
+];
 
 export function AppShell() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [mobileOpen, setMobileOpen] = useState(false);
+  const property = useActiveProperty();
+  const conditions = useConditions();
 
   return (
     <div className="min-h-dvh bg-background text-foreground">
@@ -63,7 +74,7 @@ export function AppShell() {
         <PropertySwitcher />
         <nav className="flex-1 space-y-0.5 overflow-y-auto p-3">
           {nav.map((n) => {
-            const active = pathname.startsWith(n.to);
+            const active = pathname === n.to || pathname.startsWith(n.to + "/");
             return (
               <Link
                 key={n.to}
@@ -84,7 +95,7 @@ export function AppShell() {
         <div className="border-t border-sidebar-border p-3 text-xs text-sidebar-foreground/60">
           <div className="flex items-center gap-2">
             <Wind className="h-3.5 w-3.5" />
-            <span>{conditions.wind.dir} {conditions.wind.speedMph} mph · {conditions.tempF}°F</span>
+            <span>{conditions.windDir} {conditions.windMph} mph · {conditions.tempF}°F</span>
           </div>
           <div className="mt-1">Pressure {conditions.pressureInHg}" · {conditions.pressureTrend}</div>
         </div>
@@ -116,7 +127,7 @@ export function AppShell() {
             </div>
             <nav className="space-y-0.5">
               {nav.map((n) => {
-                const active = pathname.startsWith(n.to);
+                const active = pathname === n.to || pathname.startsWith(n.to + "/");
                 return (
                   <Link
                     key={n.to}
@@ -144,7 +155,7 @@ export function AppShell() {
       {/* Mobile bottom nav */}
       <nav className="fixed bottom-0 inset-x-0 z-30 grid grid-cols-5 border-t border-border bg-background/95 backdrop-blur lg:hidden">
         {mobileNav.map((n) => {
-          const active = pathname.startsWith(n.to);
+          const active = pathname === n.to || pathname.startsWith(n.to + "/");
           return (
             <Link
               key={n.to}
@@ -165,24 +176,32 @@ export function AppShell() {
 }
 
 function PropertySwitcher() {
+  const properties = useProperties();
+  const activeId = useFreki((s) => s.activeId);
+  const active = properties.find((p) => p.id === activeId) ?? properties[0];
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button className="mx-3 mt-3 flex items-center justify-between gap-2 rounded-md border border-sidebar-border bg-sidebar-accent/40 px-3 py-2 text-left text-sm hover:bg-sidebar-accent transition">
           <div className="min-w-0">
-            <div className="truncate font-medium">{property.name}</div>
-            <div className="truncate text-xs text-sidebar-foreground/60">{property.acres} ac · {property.location}</div>
+            <div className="truncate font-medium">{active?.name ?? "No property"}</div>
+            <div className="truncate text-xs text-sidebar-foreground/60">{active ? `${active.acres} ac · ${active.location}` : "Create one"}</div>
           </div>
           <ChevronDown className="h-4 w-4 shrink-0 text-sidebar-foreground/60" />
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-56">
         <DropdownMenuLabel>Your properties</DropdownMenuLabel>
-        <DropdownMenuItem>{property.name} <span className="ml-auto text-xs text-muted-foreground">Active</span></DropdownMenuItem>
-        <DropdownMenuItem disabled>Cedar Hollow (demo)</DropdownMenuItem>
-        <DropdownMenuItem disabled>Ridgeview Club (demo)</DropdownMenuItem>
+        {properties.map((p) => (
+          <DropdownMenuItem key={p.id} onClick={() => store.setActive(p.id)}>
+            {p.name}
+            {p.id === activeId && <span className="ml-auto text-xs text-muted-foreground">Active</span>}
+          </DropdownMenuItem>
+        ))}
         <DropdownMenuSeparator />
-        <DropdownMenuItem>+ Add property</DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link to="/app/properties"><Plus className="mr-2 h-3.5 w-3.5" /> Manage properties</Link>
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
