@@ -263,6 +263,22 @@ export const store = {
     set((s) => ({ ...s, conditions: { ...s.conditions, ...patch } }));
   },
 
+  // safety
+  setSharingEnabled(enabled: boolean) {
+    set((s) => ({ ...s, safety: { ...s.safety, sharingEnabled: enabled } }));
+  },
+  addContact(v: Omit<TrustedContact, "id">) {
+    const id = `tc-${Date.now()}`;
+    set((s) => ({ ...s, safety: { ...s.safety, contacts: [...s.safety.contacts, { ...v, id }] } }));
+    return id;
+  },
+  updateContact(id: string, patch: Partial<TrustedContact>) {
+    set((s) => ({ ...s, safety: { ...s.safety, contacts: s.safety.contacts.map((c) => c.id === id ? { ...c, ...patch } : c) } }));
+  },
+  removeContact(id: string) {
+    set((s) => ({ ...s, safety: { ...s.safety, contacts: s.safety.contacts.filter((c) => c.id !== id) } }));
+  },
+
   // generic collection helpers on active property
   _mutateActive(fn: (p: Property) => Property) {
     set((s) => ({ ...s, properties: s.properties.map((p) => p.id === s.activeId ? fn(p) : p) }));
