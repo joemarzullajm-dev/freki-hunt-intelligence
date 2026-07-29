@@ -13,6 +13,7 @@ import {
 } from "@/lib/freki-data";
 import { Link } from "@tanstack/react-router";
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis, CartesianGrid } from "recharts";
+import { LiveSharingBanner, PropertySafetyCard } from "@/components/property-safety";
 
 export const Route = createFileRoute("/app/dashboard")({
   head: () => ({
@@ -27,6 +28,7 @@ export const Route = createFileRoute("/app/dashboard")({
 function Dashboard() {
   return (
     <>
+      <LiveSharingBanner />
       <PageHeader
         title={`Overview — ${property.name}`}
         description="What you should know right now."
@@ -52,6 +54,7 @@ function Dashboard() {
               conflicting={huntOutlook.conflicting}
               uncertainty="East Ridge camera has been offline for 3 days — that quadrant is under-observed."
             />
+            <PropertySafetyCard />
             <ActivityChart />
             <Hypothesis />
             <Observations />
