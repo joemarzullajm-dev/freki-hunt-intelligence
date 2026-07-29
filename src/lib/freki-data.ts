@@ -28,10 +28,6 @@ export const property = {
   },
 };
 
-// Camera 24h totals are derived from the per-camera detections24h so the
-// dashboard, cameras page, and weekly report never drift from each other.
-import type { Camera as _CameraType } from "./freki-data";
-
 export const conditions = {
   wind: { dir: "NW", speedMph: 9, trend: "steady" },
   tempF: 38,
